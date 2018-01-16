@@ -1,0 +1,16 @@
+group 'io.github.mordijc'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.9
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+}
