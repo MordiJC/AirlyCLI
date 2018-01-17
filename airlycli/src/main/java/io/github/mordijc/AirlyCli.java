@@ -1,20 +1,30 @@
 package io.github.mordijc;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.mordijc.rest.services.AirlyService;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class AirlyCli {
 
     public static void main(String[] args) throws IOException {
+        String apikey = System.getenv("API_KEY");
+
+        if (apikey == null) {
+            System.out.println("Enter Airly API Token: ");
+            Scanner scanner = new Scanner(System.in);
+            if (scanner.hasNext()) {
+                apikey = scanner.next();
+            } else {
+                // TODO: ERROR WRONG API KEY
+            }
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder().addInterceptor(
                 chain -> {
                     Request originalRequest = chain.request();
