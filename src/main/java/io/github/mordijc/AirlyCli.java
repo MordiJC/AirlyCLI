@@ -2,6 +2,7 @@ package io.github.mordijc;
 
 import com.google.gson.GsonBuilder;
 import io.github.mordijc.cli.Command;
+import io.github.mordijc.execution.CommandChecker;
 import io.github.mordijc.execution.InfoPrinter;
 import io.github.mordijc.rest.services.AirlyService;
 import okhttp3.OkHttpClient;
@@ -19,7 +20,7 @@ public class AirlyCli {
         Application application = new Application(args);
 
         application.addChainBlock(new InfoPrinter())
-                .addChainBlock();
+                .addChainBlock(new CommandChecker());
 
         Command programCommand = CommandLine.populateCommand(new Command(), args);
 
