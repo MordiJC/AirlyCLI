@@ -3,6 +3,8 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="airlycli_main" target="1.9" />
+      <module name="AirlyCli_main" target="1.9" />
+      <module name="AirlyCli_test" target="1.9" />
       <module name="airlycli_test" target="1.9" />
     </bytecodeTargetLevel>
   </component>

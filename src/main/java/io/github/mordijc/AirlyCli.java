@@ -1,11 +1,13 @@
 package io.github.mordijc;
 
 import com.google.gson.GsonBuilder;
+import io.github.mordijc.cli.Command;
 import io.github.mordijc.rest.services.AirlyService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import picocli.CommandLine;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -13,6 +15,19 @@ import java.util.Scanner;
 public class AirlyCli {
 
     public static void main(String[] args) throws IOException {
+        System.out.println(
+                "     _      _          _            ____   _       ___ \n" +
+                "    / \\    (_)  _ __  | |  _   _   / ___| | |     |_ _|\n" +
+                "   / _ \\   | | | '__| | | | | | | | |     | |      | | \n" +
+                "  / ___ \\  | | | |    | | | |_| | | |___  | |___   | | \n" +
+                " /_/   \\_\\ |_| |_|    |_|  \\__, |  \\____| |_____| |___|\n" +
+                "                           |___/                       ");
+
+        Command programCommand = CommandLine.populateCommand(new Command(), args);
+
+
+
+
         String apikey = System.getenv("API_KEY");
 
         if (apikey == null) {
@@ -21,9 +36,11 @@ public class AirlyCli {
             if (scanner.hasNext()) {
                 apikey = scanner.next();
             } else {
-                // TODO: ERROR WRONG API KEY
+                throw new RuntimeException("Airly API Token not provided.");
             }
         }
+
+        String finalApikey = apikey;
 
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder().addInterceptor(
                 chain -> {
@@ -31,7 +48,7 @@ public class AirlyCli {
 
                     Request.Builder builder = originalRequest
                             .newBuilder()
-                            .addHeader("apikey", "4e9a14482ae1428185454617bde61f46");
+                            .addHeader("apikey", finalApikey);
 
                     Request newRequest = builder.build();
 
