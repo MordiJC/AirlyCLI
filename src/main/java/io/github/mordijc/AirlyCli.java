@@ -2,6 +2,7 @@ package io.github.mordijc;
 
 import com.google.gson.GsonBuilder;
 import io.github.mordijc.cli.Command;
+import io.github.mordijc.execution.InfoPrinter;
 import io.github.mordijc.rest.services.AirlyService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -15,17 +16,12 @@ import java.util.Scanner;
 public class AirlyCli {
 
     public static void main(String[] args) throws IOException {
-        System.out.println(
-                "     _      _          _            ____   _       ___ \n" +
-                "    / \\    (_)  _ __  | |  _   _   / ___| | |     |_ _|\n" +
-                "   / _ \\   | | | '__| | | | | | | | |     | |      | | \n" +
-                "  / ___ \\  | | | |    | | | |_| | | |___  | |___   | | \n" +
-                " /_/   \\_\\ |_| |_|    |_|  \\__, |  \\____| |_____| |___|\n" +
-                "                           |___/                       ");
+        Application application = new Application(args);
+
+        application.addChainBlock(new InfoPrinter())
+                .addChainBlock();
 
         Command programCommand = CommandLine.populateCommand(new Command(), args);
-
-
 
 
         String apikey = System.getenv("API_KEY");
