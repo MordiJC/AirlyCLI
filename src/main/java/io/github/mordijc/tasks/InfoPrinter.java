@@ -1,4 +1,4 @@
-package io.github.mordijc.execution;
+package io.github.mordijc.tasks;
 
 import io.github.mordijc.Application;
 

@@ -1,6 +1,6 @@
 package io.github.mordijc;
 
-import io.github.mordijc.cli.Command;
+import io.github.mordijc.command.Command;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -13,7 +13,20 @@ public final class Application {
     private List<ApplicationExecutionBlock> applicationExecutionBlockList = new ArrayList<>();
 
     public Application(String[] args) {
-        applicationCommand = CommandLine.populateCommand(new Command(), args);
+        try {
+            applicationCommand = CommandLine.populateCommand(new Command(), args);
+        } catch (CommandLine.MissingParameterException e) {
+            printErrorMessageAndExit("Command parameters error: " + e.getMessage());
+        } catch (CommandLine.OverwrittenOptionException e) {
+            printErrorMessageAndExit("Options cannot be overwritten.\n" + e.getMessage());
+        } catch (CommandLine.UnmatchedArgumentException e) {
+            printErrorMessageAndExit("Too much arguments: " + e.getMessage());
+        }
+    }
+
+    private void printErrorMessageAndExit(String message) {
+        System.err.println(message);
+        this.exit();
     }
 
     public Command getApplicationCommand() {
@@ -40,7 +53,7 @@ public final class Application {
                 }
             }
         } catch (ApplicationExecutionBlockException e) {
-            System.err.println("Application execution exception: " + e.getMessage());
+            System.err.println("Application tasks exception: " + e.getMessage());
         }
     }
 

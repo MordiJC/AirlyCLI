@@ -1,8 +1,11 @@
 package io.github.mordijc.rest.containers;
 
+import io.github.mordijc.rest.containers.common.Address;
+import io.github.mordijc.rest.containers.common.Location;
+
 import java.util.Date;
 
-public class Sensor {
+public class NearestSensor {
     public final double airQualityIndex;
 
     public final double pm25; // 2.5
@@ -25,7 +28,7 @@ public class Sensor {
 
     @Override
     public String toString() {
-        return "Sensor{" +
+        return "NearestSensor{" +
                 "airQualityIndex=" + airQualityIndex +
                 ", pm25=" + pm25 +
                 ", pm10=" + pm10 +
@@ -39,9 +42,9 @@ public class Sensor {
                 '}';
     }
 
-    public Sensor(double airQualityIndex, double pm25, double pm10,
-                  int id, String name, String vendor, Location location, int pollutionLevel,
-                  Date measurementTime, Address address) {
+    public NearestSensor(double airQualityIndex, double pm25, double pm10,
+                         int id, String name, String vendor, Location location, int pollutionLevel,
+                         Date measurementTime, Address address) {
         this.airQualityIndex = airQualityIndex;
         this.pm25 = pm25;
         this.pm10 = pm10;
@@ -54,40 +57,4 @@ public class Sensor {
         this.address = address;
     }
 
-    public class Location {
-
-        public final double latitude;
-
-        public final double longitude;
-
-        public Location(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        @Override
-        public String toString() {
-            return "Location{" +
-                    "latitude=" + latitude +
-                    ", longitude=" + longitude +
-                    '}';
-        }
-    }
-
-    public class Address {
-        public final String streetNumber;
-
-        public final String route;
-
-        public final String locality;
-
-        public final String country;
-
-        public Address(String streetNumber, String route, String locality, String country) {
-            this.streetNumber = streetNumber;
-            this.route = route;
-            this.locality = locality;
-            this.country = country;
-        }
-    }
 }

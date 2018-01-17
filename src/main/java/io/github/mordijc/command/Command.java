@@ -1,10 +1,14 @@
-package io.github.mordijc.cli;
+package io.github.mordijc.command;
 
 import picocli.CommandLine;
 
 @CommandLine.Command(headerHeading = "Usage:%n%n",
         header = "Airly console client.",
+        name = "java -jar AirlyCLI.jar",
         descriptionHeading = "%nDescription:%n%n",
+        synopsisHeading = "%n",
+        parameterListHeading = "%nParameters:%n",
+        optionListHeading = "%nOptions:%n",
         description =
                 "This program connects to Airly REST API and provides " +
                         "information about nearest or specific air quality sensor.")
@@ -26,11 +30,11 @@ public class Command {
     public Integer sensorId = null;
 
     @CommandLine.Option(
-            names = {"-k", "--apikey"},
+            names = {"-k", "--apiKey"},
             description = "Airly REST service API token. Can also be given as API_KEY environment variable. " +
                     "If program will not find this value either in environment variable or in this option, " +
                     "then it will ask for API token.")
-    public String apikey = "";
+    public String apiKey = null;
 
     @CommandLine.Option(
             names = {"-h", "--help"},
