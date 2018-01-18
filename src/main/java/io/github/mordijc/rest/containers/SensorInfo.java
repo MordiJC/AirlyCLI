@@ -6,13 +6,13 @@ import io.github.mordijc.rest.containers.common.Location;
 public class SensorInfo {
     public final Address address;
 
-    public final int id;
+    public final Integer id;
 
     public final Location location;
 
     public final String name;
 
-    public final int pollutionLevel;
+    public final Integer pollutionLevel;
 
     public final String vendor;
 

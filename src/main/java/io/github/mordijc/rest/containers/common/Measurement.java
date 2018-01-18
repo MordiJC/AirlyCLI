@@ -3,7 +3,7 @@ package io.github.mordijc.rest.containers.common;
 import java.util.Date;
 
 public class Measurement {
-    public final double airQualityIndex;
+    public final Double airQualityIndex;
 
     public final double humidity;
 

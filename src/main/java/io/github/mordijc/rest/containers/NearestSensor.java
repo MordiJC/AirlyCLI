@@ -6,13 +6,13 @@ import io.github.mordijc.rest.containers.common.Location;
 import java.util.Date;
 
 public class NearestSensor {
-    public final double airQualityIndex;
+    public final Double airQualityIndex;
 
-    public final double pm25; // 2.5
+    public final Double pm25; // 2.5
 
-    public final double pm10;
+    public final Double pm10;
 
-    public final int id;
+    public final Integer id;
 
     public final String name;
 
@@ -20,7 +20,7 @@ public class NearestSensor {
 
     public final Location location;
 
-    public final int pollutionLevel;
+    public final Integer pollutionLevel;
 
     public final Date measurementTime;
 
@@ -42,9 +42,9 @@ public class NearestSensor {
                 '}';
     }
 
-    public NearestSensor(double airQualityIndex, double pm25, double pm10,
-                         int id, String name, String vendor, Location location, int pollutionLevel,
-                         Date measurementTime, Address address) {
+    public NearestSensor(double airQualityIndex, Double pm25, Double pm10,
+                         Integer id, String name, String vendor, Location location,
+                         Integer pollutionLevel, Date measurementTime, Address address) {
         this.airQualityIndex = airQualityIndex;
         this.pm25 = pm25;
         this.pm10 = pm10;
