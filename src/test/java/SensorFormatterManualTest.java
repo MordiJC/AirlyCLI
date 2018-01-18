@@ -32,6 +32,6 @@ public class SensorFormatterManualTest {
                 0.0
         );
 
-        System.out.println(SensorFormatter.format(sensorInfo, measurement));
+        System.out.println(new SensorFormatter().format(sensorInfo, measurement));
     }
 }

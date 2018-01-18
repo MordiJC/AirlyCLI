@@ -5,23 +5,27 @@ import io.github.mordijc.rest.containers.SensorInfo;
 import io.github.mordijc.rest.containers.common.Measurement;
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.max;
-import static java.lang.Integer.min;
 
 public class SensorFormatter {
-    public static String format(SensorInfo sensorInfo, SensorDetails sensorDetails) {
+    public String format(SensorInfo sensorInfo, SensorDetails sensorDetails) {
         return format(sensorInfo, sensorDetails.currentMeasurements);
     }
 
-    public static String format(SensorInfo sensorInfo, Measurement measurement) {
+    public String format(SensorInfo sensorInfo, Measurement measurement) {
         // Data
         String airQualityIndex = Integer.toString((int) Math.round(measurement.airQualityIndex));
         String pm25 = Integer.toString((int) Math.round(measurement.pm25));
         String pm10 = Integer.toString((int) Math.round(measurement.pm10));
-        String pressure = Integer.toString((int) Math.round(measurement.pressure) / 10);
+        String pressure = Integer.toString((int) Math.round(measurement.pressure/100));
         String temperature = Integer.toString((int) Math.round(measurement.temperature));
+        String humidity = Integer.toString((int) Math.round(measurement.humidity));
         String address = sensorInfo.address.route + " " +
                 sensorInfo.address.streetNumber;
         String city = sensorInfo.address.locality;
@@ -29,16 +33,17 @@ public class SensorFormatter {
         int pm25_value = (int) Math.round(measurement.pm25);
         int pm10_value = (int) Math.round(measurement.pm10);
 
-        String pm25_name = "PM 2.5";
-        String pm10_name = "PM 10";
-        String pressure_name = "Pressure";
-        String temperature_name = "Temp.";
+        Supplier<Stream<String>> measurement_values_supplier = () -> Stream.of(
+                pm25, pm10, pressure, temperature, humidity
+        );
 
-        String pm25_unit = "μg/m\u00B3";
-        String pm10_unit = "μg/m\u00B3";
-        String pressure_unit = "hPa";
-        String temperature_unit = "\u00B0C";
+        Supplier<Stream<String>> measurement_names_supplier = () -> Stream.of(
+                "PM 2.5", "PM 10", "Pressure", "Temp.", "Humidity"
+        );
 
+        Supplier<Stream<String>> measurement_units_supplier = () -> Stream.of(
+                "μg/m\u00B3", "μg/m\u00B3", "hPa", "\u00B0C", "%"
+        );
 
         // Top row
         int airQualityCellContentWidth = airQualityIndex.length();
@@ -47,18 +52,19 @@ public class SensorFormatter {
         int addressCellContentWidth = max(max(address.length(), city.length()), 10);
         int addressCellWidth = addressCellContentWidth + 2;
 
-        // Row
-        int longestMeasurementNameWidth = Stream.of(pm25_name, pm10_name, pressure_name, temperature_name)
-                .map(String::length)
-                .max(Integer::compareTo)
-                .orElse(5);
+        // Measurements
+        int longestMeasurementNameWidth = measurement_names_supplier.get()
+                .map(String::length).max(Integer::compareTo).orElse(5);
+
         int longestMeasurementValueWidth = Stream.of(pm25, pm10, pressure, temperature)
                 .map(String::length).max(Integer::compareTo).orElse(3);
-        int longestMeasurementUnitWidth = Stream.of(pm25_unit, pm10_unit, pressure_unit, temperature_unit)
+
+        int longestMeasurementUnitWidth = measurement_units_supplier.get()
                 .map(String::length).max(Integer::compareTo).orElse(0);
+
         int longestMeasurementPercentageValue =
-                Stream.of(Integer.toString(pm25_value*4), Integer.toString(pm10_value*2))
-                .map(s->s.length()+1).max(Integer::compareTo).orElse(0);
+                Stream.of(Integer.toString(pm25_value * 4), Integer.toString(pm10_value * 2))
+                        .map(s -> s.length() + 1).max(Integer::compareTo).orElse(0);
 
         int measurementsRowMinimumContentWidth = longestMeasurementNameWidth + 1
                 + longestMeasurementValueWidth + 1
@@ -66,13 +72,13 @@ public class SensorFormatter {
                 + longestMeasurementPercentageValue;
         int measurementsRowMinimumWidth = measurementsRowMinimumContentWidth + 2;
 
-        if(measurementsRowMinimumWidth - airQualityCellWidth - 1
+        if (measurementsRowMinimumWidth - airQualityCellWidth - 1
                 > addressCellWidth) {
 
             addressCellWidth = measurementsRowMinimumWidth - airQualityCellWidth - 1;
             addressCellContentWidth = addressCellWidth - 2;
 
-        } else if(measurementsRowMinimumWidth - airQualityCellWidth - 1
+        } else if (measurementsRowMinimumWidth - airQualityCellWidth - 1
                 < addressCellWidth) {
             measurementsRowMinimumContentWidth = addressCellWidth + airQualityCellWidth + 1;
             measurementsRowMinimumWidth = measurementsRowMinimumContentWidth;
@@ -82,67 +88,114 @@ public class SensorFormatter {
         int measurementsLineSpacesNumber = measurementsRowMinimumContentWidth - longestMeasurementNameWidth
                 - longestMeasurementValueWidth - longestMeasurementUnitWidth - longestMeasurementPercentageValue - 1 - 2;
 
-        String measurementsLineBasicFormat =
-                "%-" + Integer.toString(longestMeasurementNameWidth)
-                        + "s" + String.join("", Collections.nCopies(measurementsLineSpacesNumber / 2, " "))
-                        + "%" + Integer.toString(longestMeasurementValueWidth)
-                        + "s %-" + Integer.toString(longestMeasurementUnitWidth)
-                        + "s" + String.join("", Collections.nCopies(measurementsLineSpacesNumber / 2 + measurementsLineSpacesNumber % 2, " "))
-                        + "%" + Integer.toString(longestMeasurementPercentageValue) + "s";
+        String measurementsLineBasicFormat = getMeasurementsLineFormat(longestMeasurementNameWidth, longestMeasurementValueWidth, longestMeasurementUnitWidth, longestMeasurementPercentageValue, measurementsLineSpacesNumber);
 
-        String pm25_line = String.format(measurementsLineBasicFormat, pm25_name, pm25, pm25_unit, Integer.toString(pm25_value*4) + "%");
-        String pm10_line = String.format(measurementsLineBasicFormat, pm10_name, pm10, pm10_unit, Integer.toString(pm10_value*2) + "%");
-        String pressure_line = String.format(measurementsLineBasicFormat, pressure_name, pressure, pressure_unit, "");
-        String temperature_line = String.format(measurementsLineBasicFormat, temperature_name, temperature, temperature_unit, "");
+        List<String> measurementLines = prepare(measurementsLineBasicFormat,
+                measurement_names_supplier.get(),
+                measurement_values_supplier.get(),
+                measurement_units_supplier.get(),
+                Stream.of(Integer.toString(pm25_value * 4) + "%", Integer.toString(pm10_value * 2) + "%")
+        );
 
+        return getTopTableLine(airQualityCellWidth, addressCellWidth) +
+                "║ " +
+                airQualityIndex +
+                " ║ " +
+                createAddressCellContent(address, addressCellContentWidth) +
+                " ║\n" +
+                '╠' +
+                String.join("", Collections.nCopies(airQualityCellWidth, "═")) +
+                "╝ " +
+                createAddressCellContent(city, addressCellContentWidth) +
+                " ║\n║ " +
+                createMeasurementLines(measurementLines) +
+                getBottomTableLine(airQualityCellWidth, addressCellWidth);
+    }
 
-        StringBuilder builder = new StringBuilder()
-                .append('╔')
-                .append(String.join("", Collections.nCopies(airQualityCellWidth, "═")))
-                .append('╦')
-                .append(String.join("", Collections.nCopies(addressCellWidth, "═")))
-                .append("╗\n")
+    private String getMeasurementsLineFormat(int longestMeasurementNameWidth, int longestMeasurementValueWidth, int longestMeasurementUnitWidth, int longestMeasurementPercentageValue, int measurementsLineSpacesNumber) {
+        return "%-" + Integer.toString(longestMeasurementNameWidth)
+                + "s" + String.join("", Collections.nCopies(measurementsLineSpacesNumber / 2, " "))
+                + "%" + Integer.toString(longestMeasurementValueWidth)
+                + "s %-" + Integer.toString(longestMeasurementUnitWidth)
+                + "s" + String.join("", Collections.nCopies(measurementsLineSpacesNumber / 2 + measurementsLineSpacesNumber % 2, " "))
+                + "%" + Integer.toString(longestMeasurementPercentageValue) + "s";
+    }
 
-                .append("║ ")
-                .append(airQualityIndex)
-                .append(" ║ ")
+    private String createAddressCellContent(String content, int cellContentSize) {
+        return String.join("", Collections.nCopies((cellContentSize - content.length()) / 2, " ")) +
+                content +
+                String.join("", Collections.nCopies(cellContentSize - content.length() - (cellContentSize - content.length()) / 2, " "));
+    }
 
-                .append(String.join("", Collections.nCopies((addressCellContentWidth - address.length()) / 2, " ")))
-                .append(address)
-                .append(String.join("", Collections.nCopies(addressCellContentWidth - address.length()- (addressCellContentWidth - address.length())/2, " ")))
+    private String getTopTableLine(int leftCellWidth, int rightCellWidth) {
+        return "╔" +
+                String.join("", Collections.nCopies(leftCellWidth, "═")) +
+                '╦' +
+                String.join("", Collections.nCopies(rightCellWidth, "═")) +
+                "╗\n";
+    }
 
-                .append(" ║\n")
-                .append('╠')
-                .append(String.join("", Collections.nCopies(airQualityCellWidth, "═")))
-                .append("╝ ")
+    private String getBottomTableLine(int leftCellWidth, int rightCellWidth) {
+        return "╚" +
+                String.join("", Collections.nCopies(leftCellWidth + 1 + rightCellWidth, "═")) +
+                "╝\n";
+    }
 
-                .append(String.join("", Collections.nCopies((addressCellContentWidth - city.length()) / 2, " ")))
-                .append(city)
-                .append(String.join("", Collections.nCopies(addressCellContentWidth - city.length() - (addressCellContentWidth - city.length()) / 2, " ")))
+    private String createMeasurementLines(List<String> measurementLines) {
+        StringBuilder builder = new StringBuilder();
+        measurementLines.stream().limit(measurementLines.size() - 1).forEach(l -> {
+            builder.append(l);
+            builder.append(" ║\n║ ");
+        });
 
-                .append(" ║\n║ ")
-
-                .append(pm25_line)
-
-                .append(" ║\n║ ")
-
-                .append(pm10_line)
-
-                .append(" ║\n║ ")
-
-                .append(pressure_line)
-
-                .append(" ║\n║ ")
-
-                .append(temperature_line)
-
-                .append(" ║\n")
-
-                .append('╚')
-                .append(String.join("", Collections.nCopies(measurementsRowMinimumContentWidth, "═")))
-                .append("╝\n");
-
+        measurementLines.stream().skip(measurementLines.size() - 1).forEach(l -> {
+            builder.append(l);
+            builder.append(" ║\n");
+        });
 
         return builder.toString();
     }
+
+    private List<String> prepare(String lineFormat, Stream<String> names, Stream<String> values,
+                                 Stream<String> units, Stream<String> percentages) {
+        List<String> output = new LinkedList<>();
+
+        List<String> namesList = names.collect(Collectors.toList());
+        List<String> valuesList = values.collect(Collectors.toList());
+        List<String> unitsList = units.collect(Collectors.toList());
+        List<String> percentagesList = percentages.collect(Collectors.toList());
+
+        int maxLength = Stream.of(namesList, valuesList, unitsList, percentagesList)
+                .map(List::size).max(Integer::compareTo).orElse(0);
+
+        for (int i = 0; i < maxLength; ++i) {
+            output.add(
+                    String.format(lineFormat,
+                            defaultIfNull(getFromListOrNull(namesList, i), ""),
+                            defaultIfNull(getFromListOrNull(valuesList, i), ""),
+                            defaultIfNull(getFromListOrNull(unitsList, i), ""),
+                            defaultIfNull(getFromListOrNull(percentagesList, i), "")
+                    )
+            );
+        }
+
+        return output;
+    }
+
+    private <T> T getFromListOrNull(List<T> list, int index) {
+        try {
+            return list.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    private <T> T defaultIfNull(T o, T def) {
+        if (o == null) {
+            return def;
+        } else {
+            return o;
+        }
+    }
+
 }

@@ -53,7 +53,7 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
                         .execute().body();
 
                 System.out.println(
-                        SensorFormatter.format(sensorInfo, sensorDetails)
+                        new SensorFormatter().format(sensorInfo, sensorDetails)
                 );
 
             } catch (IOException e) {
@@ -117,7 +117,7 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
                         return chain.proceed(newRequest);
                     } catch (UnknownHostException e) {
                         throw new Application.ApplicationExecutionBlockException(
-                                "Unknown host: " + e.getMessage());
+                                "Unknown host or no connection: " + e.getMessage());
                     } catch (IOException e) {
                         throw new Application.ApplicationExecutionBlockException(
                                 "Unknown error: " + e.getMessage()
