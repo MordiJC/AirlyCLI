@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 
 public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
     @Override
@@ -52,7 +53,7 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
                         .execute().body();
 
                 System.out.println(
-                        SensorFormatter.formatSensor(sensorInfo, sensorDetails)
+                        SensorFormatter.format(sensorInfo, sensorDetails)
                 );
 
             } catch (IOException e) {
@@ -62,7 +63,14 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
             }
         } else if (command.sensorId != null) {
             try {
-                System.out.println(service.getSensorMeasurements(command.sensorId).execute().body());
+                Response<?> sensorMeasurementsResponse =
+                        service.getSensorMeasurements(command.sensorId).execute();
+
+                if (handleErrors(app, sensorMeasurementsResponse)) {
+                    return;
+                }
+
+                System.out.println(sensorMeasurementsResponse.body());
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
@@ -77,20 +85,15 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
     }
 
     private <T> boolean handleErrors(Application app, Response<T> nearestSensorResponse) throws IOException {
-        switch (nearestSensorResponse.code()) {
-            case 400:
-            case 500:
-            case 401:
-            case 403:
-            case 404:
+        if (nearestSensorResponse.code() >= 400) {
                 if (nearestSensorResponse.errorBody() != null) {
                     ApiError apiError = new ApiError(nearestSensorResponse.errorBody().string());
 
                     System.err.println(
-                            "APIError: " + apiError.message
+                            "API error: " + apiError.message
                     );
                 } else {
-                    System.err.println("APIError: Code = " + nearestSensorResponse.code());
+                    System.err.println("Unknown API error. Code: " + nearestSensorResponse.code());
                 }
 
                 app.exit();
@@ -110,7 +113,16 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
 
                     Request newRequest = builder.build();
 
-                    return chain.proceed(newRequest);
+                    try {
+                        return chain.proceed(newRequest);
+                    } catch (UnknownHostException e) {
+                        throw new Application.ApplicationExecutionBlockException(
+                                "Unknown host: " + e.getMessage());
+                    } catch (IOException e) {
+                        throw new Application.ApplicationExecutionBlockException(
+                                "Unknown error: " + e.getMessage()
+                        );
+                    }
                 }
 
         ).build();

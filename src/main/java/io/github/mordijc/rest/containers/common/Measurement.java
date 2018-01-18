@@ -3,25 +3,27 @@ package io.github.mordijc.rest.containers.common;
 import java.util.Date;
 
 public class Measurement {
-    final double airQualityIndex;
+    public final double airQualityIndex;
 
-    final double humidity;
+    public final double humidity;
 
-    final Date measurementTime;
+    public final Date measurementTime;
 
-    final double pm1;
+    public final double pm1;
 
-    final double pm25; // 2.5
+    public final double pm25; // 2.5
 
-    final double pm10;
+    public final double pm10;
 
-    final int pollutionLevel;
+    public final int pollutionLevel;
 
-    final double pressure;
+    public final double pressure;
 
-    final double temperature;
+    public final double temperature;
 
-    public Measurement(double airQualityIndex, double humidity, Date measurementTime, double pm1, double pm25, double pm10, int pollutionLevel, double pressure, double temperature) {
+    public Measurement(double airQualityIndex, double humidity, Date measurementTime,
+                       double pm1, double pm25, double pm10, int pollutionLevel,
+                       double pressure, double temperature) {
         this.airQualityIndex = airQualityIndex;
         this.humidity = humidity;
         this.measurementTime = measurementTime;
