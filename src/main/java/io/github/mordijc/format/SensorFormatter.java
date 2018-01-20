@@ -1,6 +1,6 @@
 package io.github.mordijc.format;
 
-import io.github.mordijc.rest.containers.SensorDetails;
+import io.github.mordijc.rest.containers.SensorMeasurements;
 import io.github.mordijc.rest.containers.SensorInfo;
 import io.github.mordijc.rest.containers.common.Measurement;
 
@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 import static java.lang.Integer.max;
 
 public class SensorFormatter {
-    public String format(SensorInfo sensorInfo, SensorDetails sensorDetails) {
-        return format(sensorInfo, sensorDetails.currentMeasurements);
+    public String format(SensorInfo sensorInfo, SensorMeasurements sensorMeasurements) {
+        return format(sensorInfo, sensorMeasurements.currentMeasurements);
     }
 
     public String format(SensorInfo sensorInfo, Measurement measurement) {
@@ -42,7 +42,7 @@ public class SensorFormatter {
         );
 
         Supplier<Stream<String>> measurement_units_supplier = () -> Stream.of(
-                "μg/m\u00B3", "μg/m\u00B3", "hPa", "\u00B0C", "%"
+                "\u03BCg/m\u00B3", "\u03BCg/m\u00B3", "hPa", "\u00B0C", "%"
         );
 
         // Top row
@@ -98,16 +98,16 @@ public class SensorFormatter {
         );
 
         return getTopTableLine(airQualityCellWidth, addressCellWidth) +
-                "║ " +
+                "\u2551 " +
                 airQualityIndex +
-                " ║ " +
+                " \u2551 " +
                 createAddressCellContent(address, addressCellContentWidth) +
-                " ║\n" +
-                '╠' +
-                String.join("", Collections.nCopies(airQualityCellWidth, "═")) +
-                "╝ " +
+                " \u2551\n" +
+                '\u2560' +
+                String.join("", Collections.nCopies(airQualityCellWidth, "\u2550")) +
+                "\u255D " +
                 createAddressCellContent(city, addressCellContentWidth) +
-                " ║\n║ " +
+                " \u2551\n\u2551 " +
                 createMeasurementLines(measurementLines) +
                 getBottomTableLine(airQualityCellWidth, addressCellWidth);
     }
@@ -128,29 +128,29 @@ public class SensorFormatter {
     }
 
     private String getTopTableLine(int leftCellWidth, int rightCellWidth) {
-        return "╔" +
-                String.join("", Collections.nCopies(leftCellWidth, "═")) +
-                '╦' +
-                String.join("", Collections.nCopies(rightCellWidth, "═")) +
-                "╗\n";
+        return "\u2554" +
+                String.join("", Collections.nCopies(leftCellWidth, "\u2550")) +
+                '\u2566' +
+                String.join("", Collections.nCopies(rightCellWidth, "\u2550")) +
+                "\u2557\n";
     }
 
     private String getBottomTableLine(int leftCellWidth, int rightCellWidth) {
-        return "╚" +
-                String.join("", Collections.nCopies(leftCellWidth + 1 + rightCellWidth, "═")) +
-                "╝\n";
+        return "\u255A" +
+                String.join("", Collections.nCopies(leftCellWidth + 1 + rightCellWidth, "\u2550")) +
+                "\u255D\n";
     }
 
     private String createMeasurementLines(List<String> measurementLines) {
         StringBuilder builder = new StringBuilder();
         measurementLines.stream().limit(measurementLines.size() - 1).forEach(l -> {
             builder.append(l);
-            builder.append(" ║\n║ ");
+            builder.append(" \u2551\n\u2551 ");
         });
 
         measurementLines.stream().skip(measurementLines.size() - 1).forEach(l -> {
             builder.append(l);
-            builder.append(" ║\n");
+            builder.append(" \u2551\n");
         });
 
         return builder.toString();

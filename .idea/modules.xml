@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AirlyCli.iml" filepath="$PROJECT_DIR$/.idea/modules/AirlyCli.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AirlyCli_main.iml" filepath="$PROJECT_DIR$/.idea/modules/AirlyCli_main.iml" group="AirlyCli" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AirlyCli_test.iml" filepath="$PROJECT_DIR$/.idea/modules/AirlyCli_test.iml" group="AirlyCli" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/airlycli/airlycli.iml" filepath="$PROJECT_DIR$/.idea/modules/airlycli/airlycli.iml" group="airlycli" />
     </modules>
   </component>
 </project>

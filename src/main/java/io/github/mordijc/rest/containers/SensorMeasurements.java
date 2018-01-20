@@ -5,7 +5,7 @@ import io.github.mordijc.rest.containers.common.MeasurementsRecord;
 
 import java.util.List;
 
-public class SensorDetails {
+public class SensorMeasurements {
 
     public final Measurement currentMeasurements;
 
@@ -13,7 +13,7 @@ public class SensorDetails {
 
     public final List<MeasurementsRecord> forecast;
 
-    public SensorDetails(Measurement currentMeasurements, List<MeasurementsRecord> history, List<MeasurementsRecord> forecast) {
+    public SensorMeasurements(Measurement currentMeasurements, List<MeasurementsRecord> history, List<MeasurementsRecord> forecast) {
         this.currentMeasurements = currentMeasurements;
         this.history = history;
         this.forecast = forecast;
@@ -21,7 +21,7 @@ public class SensorDetails {
 
     @Override
     public String toString() {
-        return "SensorDetails{" +
+        return "SensorMeasurements{" +
                 "currentMeasurements=" + currentMeasurements +
                 ", history=" + history +
                 ", forecast=" + forecast +

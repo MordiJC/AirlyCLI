@@ -1,7 +1,7 @@
 package io.github.mordijc.rest.services;
 
 import io.github.mordijc.rest.containers.NearestSensor;
-import io.github.mordijc.rest.containers.SensorDetails;
+import io.github.mordijc.rest.containers.SensorMeasurements;
 import io.github.mordijc.rest.containers.SensorInfo;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,7 +14,7 @@ public interface AirlyService {
     Call<NearestSensor> getNearestSensorData(@Query("latitude") double latitude, @Query("longitude") double longitude);
 
     @GET("v1/sensor/measurements")
-    Call<SensorDetails> getSensorMeasurements(@Query("sensorId") int sensorId);
+    Call<SensorMeasurements> getSensorMeasurements(@Query("sensorId") int sensorId);
 
     @GET("v1/sensors/{sensorId}")
     Call<SensorInfo> getSensorInfo(@Path("sensorId") int sensorId);

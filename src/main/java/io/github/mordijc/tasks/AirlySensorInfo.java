@@ -6,7 +6,7 @@ import io.github.mordijc.command.Command;
 import io.github.mordijc.format.SensorFormatter;
 import io.github.mordijc.rest.containers.ApiError;
 import io.github.mordijc.rest.containers.NearestSensor;
-import io.github.mordijc.rest.containers.SensorDetails;
+import io.github.mordijc.rest.containers.SensorMeasurements;
 import io.github.mordijc.rest.containers.SensorInfo;
 import io.github.mordijc.rest.services.AirlyService;
 import okhttp3.OkHttpClient;
@@ -49,11 +49,11 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
                 SensorInfo sensorInfo = service.getSensorInfo(nearestSensor.id)
                         .execute().body();
 
-                SensorDetails sensorDetails = service.getSensorMeasurements(nearestSensor.id)
+                SensorMeasurements sensorMeasurements = service.getSensorMeasurements(nearestSensor.id)
                         .execute().body();
 
                 System.out.println(
-                        new SensorFormatter().format(sensorInfo, sensorDetails)
+                        new SensorFormatter().format(sensorInfo, sensorMeasurements)
                 );
 
             } catch (IOException e) {
@@ -63,14 +63,20 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
             }
         } else if (command.sensorId != null) {
             try {
-                Response<?> sensorMeasurementsResponse =
+                Response<SensorMeasurements> sensorMeasurementsResponse =
                         service.getSensorMeasurements(command.sensorId).execute();
 
                 if (handleErrors(app, sensorMeasurementsResponse)) {
                     return;
                 }
 
-                System.out.println(sensorMeasurementsResponse.body());
+                SensorInfo sensorInfo = service.getSensorInfo(command.sensorId)
+                        .execute().body();
+
+                System.out.println(
+                        new SensorFormatter()
+                        .format(sensorInfo, sensorMeasurementsResponse.body())
+                );
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();

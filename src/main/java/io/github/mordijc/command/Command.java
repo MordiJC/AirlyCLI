@@ -11,7 +11,8 @@ import picocli.CommandLine;
         optionListHeading = "%nOptions:%n",
         description =
                 "This program connects to Airly REST API and provides " +
-                        "information about nearest or specific air quality sensor.")
+                        "information about nearest or specific air quality sensor.\n" +
+                        "Your system have to support UTF-8 encoding. On windows enable code page 65001.")
 public class Command {
 
     @CommandLine.Option(
