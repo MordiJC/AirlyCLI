@@ -5,27 +5,32 @@ import io.github.mordijc.rest.containers.common.MeasurementsRecord;
 
 import java.util.List;
 
+/**
+ * Airly sensor measurement data structure.
+ */
 public class SensorMeasurements {
 
+    /**
+     * Latest sensor measurement.
+     */
     public final Measurement currentMeasurements;
 
+    /**
+     * Historic measurement.
+     */
     public final List<MeasurementsRecord> history;
 
+    /**
+     * Measurements forecast.
+     */
     public final List<MeasurementsRecord> forecast;
 
+    /**
+     * Constructs object from given data.
+     */
     public SensorMeasurements(Measurement currentMeasurements, List<MeasurementsRecord> history, List<MeasurementsRecord> forecast) {
         this.currentMeasurements = currentMeasurements;
         this.history = history;
         this.forecast = forecast;
     }
-
-    @Override
-    public String toString() {
-        return "SensorMeasurements{" +
-                "currentMeasurements=" + currentMeasurements +
-                ", history=" + history +
-                ", forecast=" + forecast +
-                '}';
-    }
-
 }

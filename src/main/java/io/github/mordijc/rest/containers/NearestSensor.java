@@ -5,43 +5,63 @@ import io.github.mordijc.rest.containers.common.Location;
 
 import java.util.Date;
 
+/**
+ * Nearest sensor APi response container.
+ */
 public class NearestSensor {
+    /**
+     * Air quality index.
+     */
     public final Double airQualityIndex;
 
+    /**
+     * PM 2.5 dust level.
+     */
     public final Double pm25; // 2.5
 
+    /**
+     * PM 10 dust level.
+     */
     public final Double pm10;
 
+    /**
+     * Sensor ID.
+     */
     public final Integer id;
 
+    /**
+     * Sensor name.
+     */
     public final String name;
 
+    /**
+     * Sensor vendor.
+     */
     public final String vendor;
 
+    /**
+     * Sensor location.
+     */
     public final Location location;
 
+    /**
+     * Sensor pollution level.
+     */
     public final Integer pollutionLevel;
 
+    /**
+     * Sensor measurement time.
+     */
     public final Date measurementTime;
 
+    /**
+     * Sensor address.
+     */
     public final Address address;
 
-    @Override
-    public String toString() {
-        return "NearestSensor{" +
-                "airQualityIndex=" + airQualityIndex +
-                ", pm25=" + pm25 +
-                ", pm10=" + pm10 +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", vendor='" + vendor + '\'' +
-                ", location=" + location +
-                ", pollutionLevel=" + pollutionLevel +
-                ", measurementTime=" + measurementTime +
-                ", address=" + address +
-                '}';
-    }
-
+    /**
+     * Constructs object from given data.
+     */
     public NearestSensor(double airQualityIndex, Double pm25, Double pm10,
                          Integer id, String name, String vendor, Location location,
                          Integer pollutionLevel, Date measurementTime, Address address) {

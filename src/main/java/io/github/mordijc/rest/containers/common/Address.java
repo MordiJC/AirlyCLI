@@ -1,5 +1,8 @@
 package io.github.mordijc.rest.containers.common;
 
+/**
+ * Address representation.
+ */
 public class Address {
     public final String streetNumber;
 
@@ -14,15 +17,5 @@ public class Address {
         this.route = route;
         this.locality = locality;
         this.country = country;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "streetNumber='" + streetNumber + '\'' +
-                ", route='" + route + '\'' +
-                ", locality='" + locality + '\'' +
-                ", country='" + country + '\'' +
-                '}';
     }
 }

@@ -2,23 +2,32 @@ package io.github.mordijc.rest.containers.common;
 
 import java.util.Date;
 
+/**
+ * Sensor measurement record.
+ */
 public class MeasurementsRecord {
-    final Measurement measurements;
-    final Date fromDateTime;
-    final Date tillDateTime;
 
-    public MeasurementsRecord(Measurement measurements, Date fromDateTime, Date tillDateTime) {
-        this.measurements = measurements;
+    /**
+     * Sensor measurement data.
+     */
+    public final Measurement measurement;
+
+    /**
+     * Measurement start time.
+     */
+    public final Date fromDateTime;
+
+    /**
+     * Measurement end time.
+     */
+    public final Date tillDateTime;
+
+    /**
+     * Constructs object from given data.
+     */
+    public MeasurementsRecord(Measurement measurement, Date fromDateTime, Date tillDateTime) {
+        this.measurement = measurement;
         this.fromDateTime = fromDateTime;
         this.tillDateTime = tillDateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "MeasurementsRecord{" +
-                "measurements=" + measurements +
-                ", fromDateTime=" + fromDateTime +
-                ", tillDateTime=" + tillDateTime +
-                '}';
     }
 }

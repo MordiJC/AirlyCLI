@@ -19,7 +19,7 @@ import static java.lang.Integer.max;
 public class SensorFormatter {
     /**
      * @param sensorInfo         basic sensor data.
-     * @param sensorMeasurements sensor measurements (only current measurements will used)
+     * @param sensorMeasurements sensor measurement (only current measurement will used)
      * @return curses-like box with information about sensor.
      */
     public String format(SensorInfo sensorInfo, SensorMeasurements sensorMeasurements) {

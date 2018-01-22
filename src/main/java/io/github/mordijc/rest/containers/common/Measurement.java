@@ -2,25 +2,58 @@ package io.github.mordijc.rest.containers.common;
 
 import java.util.Date;
 
+/**
+ * Sensor measurement container.
+ */
 public class Measurement {
+    /**
+     * Air quality index.
+     */
     public final Double airQualityIndex;
 
+    /**
+     * Air humidity.
+     */
     public final double humidity;
 
+    /**
+     * Time of measurement.
+     */
     public final Date measurementTime;
 
+    /**
+     * PM 1 dust level.
+     */
     public final double pm1;
 
-    public final double pm25; // 2.5
+    /**
+     * PM 2.5 dust level.
+     */
+    public final double pm25;
 
+    /**
+     * PM 10 dust level.
+     */
     public final double pm10;
 
+    /**
+     * Air pollution level
+     */
     public final int pollutionLevel;
 
+    /**
+     * Atmosphere pressure.
+     */
     public final double pressure;
 
+    /**
+     * Air temperature.
+     */
     public final double temperature;
 
+    /**
+     * Constructs object from given data.
+     */
     public Measurement(double airQualityIndex, double humidity, Date measurementTime,
                        double pm1, double pm25, double pm10, int pollutionLevel,
                        double pressure, double temperature) {
@@ -33,20 +66,5 @@ public class Measurement {
         this.pollutionLevel = pollutionLevel;
         this.pressure = pressure;
         this.temperature = temperature;
-    }
-
-    @Override
-    public String toString() {
-        return "Measurement{" +
-                "airQualityIndex=" + airQualityIndex +
-                ", humidity=" + humidity +
-                ", measurementTime=" + measurementTime +
-                ", pm1=" + pm1 +
-                ", pm25=" + pm25 +
-                ", pm10=" + pm10 +
-                ", pollutionLevel=" + pollutionLevel +
-                ", pressure=" + pressure +
-                ", temperature=" + temperature +
-                '}';
     }
 }

@@ -1,5 +1,8 @@
 package io.github.mordijc.rest.containers.common;
 
+/**
+ *  Representation of location on earth globe.
+ */
 public class Location {
 
     public final double latitude;
@@ -11,11 +14,4 @@ public class Location {
         this.longitude = longitude;
     }
 
-    @Override
-    public String toString() {
-        return "Location{" +
-                "latitude=" + latitude +
-                ", longitude=" + longitude +
-                '}';
-    }
 }

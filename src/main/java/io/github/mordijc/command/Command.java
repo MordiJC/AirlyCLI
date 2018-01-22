@@ -2,6 +2,9 @@ package io.github.mordijc.command;
 
 import picocli.CommandLine;
 
+/**
+ * Command object used to map program command using PicoCLI.
+ */
 @CommandLine.Command(headerHeading = "Usage:%n%n",
         header = "Airly console client.",
         name = "java -jar AirlyCLI.jar",
