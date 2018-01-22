@@ -6,12 +6,19 @@ import picocli.CommandLine;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main application class. Parses arguments and executes task chain.
+ */
 public final class Application {
     private boolean shouldStop = false;
     private Command applicationCommand;
-
     private List<ApplicationExecutionBlock> applicationExecutionBlockList = new ArrayList<>();
 
+    /**
+     * Constructs {@code Application}. Arguments are parsed and pre-validated.
+     *
+     * @param args program arguments.
+     */
     public Application(String[] args) {
         try {
             applicationCommand = CommandLine.populateCommand(new Command(), args);
@@ -24,15 +31,16 @@ public final class Application {
         }
     }
 
-    private void printErrorMessageAndExit(String message) {
-        System.err.println(message);
-        this.exit();
-    }
-
+    /**
+     * Returns application parsed command.
+     */
     public Command getApplicationCommand() {
         return applicationCommand;
     }
 
+    /**
+     * Adds task to execution chain.
+     */
     public Application addChainBlock(ApplicationExecutionBlock applicationExecutionBlock) {
         assert (applicationCommand != null);
 
@@ -41,10 +49,17 @@ public final class Application {
         return this;
     }
 
+    /**
+     * Tells application not to execute next task. WARNING!!! This will not
+     * stop execution of current task, you have to do it on your own.
+     */
     public void exit() {
         this.shouldStop = true;
     }
 
+    /**
+     * Starts execution of application task chain.
+     */
     public void run() {
         try {
             for (ApplicationExecutionBlock applicationExecutionBlock : applicationExecutionBlockList) {
@@ -57,8 +72,26 @@ public final class Application {
         }
     }
 
+
+    private void printErrorMessageAndExit(String message) {
+        System.err.println(message);
+        this.exit();
+    }
+
+    /**
+     * This interface is used to represent task in application execution chain.
+     * Classes implementing this interface can be added to {@code Application}
+     * execution chain.
+     */
     public interface ApplicationExecutionBlock {
 
+
+        /**
+         * Runs this execution block when executed by {@code Application}.
+         *
+         * @param app {@code Application} instance.
+         * @throws ApplicationExecutionBlockException
+         */
         void run(Application app) throws ApplicationExecutionBlockException;
     }
 

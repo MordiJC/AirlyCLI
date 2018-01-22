@@ -20,77 +20,96 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 
-public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
+public class AirlySensorInfoTask implements Application.ApplicationExecutionBlock {
     @Override
     public void run(Application app) throws Application.ApplicationExecutionBlockException {
 
-        String apikey = getApiKey(app);
+        String apiKey = getApiKey(app);
 
-        Retrofit retrofit = getRetrofit(apikey);
+        Retrofit retrofit = getRetrofit(apiKey);
 
         AirlyService service = retrofit.create(AirlyService.class);
 
         Command command = app.getApplicationCommand();
 
         if (command.latitude != null && command.longitude != null) {
-            try {
+            showNearestSensorInfo(app, service, command);
 
-                Response<NearestSensor> nearestSensorResponse = service.getNearestSensorData(
-                        command.latitude, command.longitude
-                ).execute();
-
-                if (handleErrors(app, nearestSensorResponse)) {
-                    return;
-                }
-
-                NearestSensor nearestSensor = nearestSensorResponse.body();
-
-
-                SensorInfo sensorInfo = service.getSensorInfo(nearestSensor.id)
-                        .execute().body();
-
-                SensorMeasurements sensorMeasurements = service.getSensorMeasurements(nearestSensor.id)
-                        .execute().body();
-
-                System.out.println(
-                        new SensorFormatter().format(sensorInfo, sensorMeasurements)
-                );
-
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-                app.exit();
-            }
         } else if (command.sensorId != null) {
-            try {
-                Response<SensorMeasurements> sensorMeasurementsResponse =
-                        service.getSensorMeasurements(command.sensorId).execute();
+            showSpecificSensorInfo(app, service, command);
 
-                if (handleErrors(app, sensorMeasurementsResponse)) {
-                    return;
-                }
-
-                SensorInfo sensorInfo = service.getSensorInfo(command.sensorId)
-                        .execute().body();
-
-                System.out.println(
-                        new SensorFormatter()
-                        .format(sensorInfo, sensorMeasurementsResponse.body())
-                );
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-                app.exit();
-            }
         } else {
             throw new Application.ApplicationExecutionBlockException(
                     "Illegal command state. Make sure that you are validating it before running this task."
             );
         }
-
     }
 
-    private <T> boolean handleErrors(Application app, Response<T> nearestSensorResponse) throws IOException {
+    private void showSpecificSensorInfo(Application app, AirlyService service, Command command) {
+        try {
+            Response<SensorMeasurements> sensorMeasurementsResponse =
+                    service.getSensorMeasurements(command.sensorId).execute();
+
+            if (handleConnectionErrorsAndTellIfOccured(app, sensorMeasurementsResponse)) {
+                return;
+            }
+
+            SensorInfo sensorInfo = service.getSensorInfo(command.sensorId)
+                    .execute().body();
+
+            System.out.println(
+                    new SensorFormatter()
+                    .format(sensorInfo, sensorMeasurementsResponse.body())
+            );
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            app.exit();
+        }
+    }
+
+    private void showNearestSensorInfo(Application app, AirlyService service, Command command) {
+        try {
+            Response<NearestSensor> nearestSensorResponse = service.getNearestSensorData(
+                    command.latitude, command.longitude
+            ).execute();
+
+            if (handleConnectionErrorsAndTellIfOccured(app, nearestSensorResponse)) {
+                return;
+            }
+
+            NearestSensor nearestSensor = nearestSensorResponse.body();
+
+            Response<SensorInfo> sensorInfoResponse = service.getSensorInfo(nearestSensor.id)
+                    .execute();
+
+            if (handleConnectionErrorsAndTellIfOccured(app, sensorInfoResponse)) {
+                return;
+            }
+
+            SensorInfo sensorInfo = sensorInfoResponse.body();
+
+            Response<SensorMeasurements> sensorMeasurementsResponse = service.getSensorMeasurements(nearestSensor.id)
+                    .execute();
+
+            if (handleConnectionErrorsAndTellIfOccured(app, sensorMeasurementsResponse)) {
+                return;
+            }
+
+            SensorMeasurements sensorMeasurements = sensorMeasurementsResponse.body();
+
+            System.out.println(
+                    new SensorFormatter().format(sensorInfo, sensorMeasurements)
+            );
+
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            app.exit();
+        }
+    }
+
+    private <T> boolean handleConnectionErrorsAndTellIfOccured(Application app, Response<T> nearestSensorResponse) throws IOException {
         if (nearestSensorResponse.code() >= 400) {
                 if (nearestSensorResponse.errorBody() != null) {
                     ApiError apiError = new ApiError(nearestSensorResponse.errorBody().string());
@@ -145,18 +164,18 @@ public class AirlySensorInfo implements Application.ApplicationExecutionBlock {
     }
 
     private String getApiKey(Application app) {
-        String apikey = System.getenv("API_KEY");
+        String apiKey = System.getenv("API_KEY");
 
-        if (apikey == null) {
+        if (apiKey == null) {
             Command command = app.getApplicationCommand();
 
-            apikey = command.apiKey;
+            apiKey = command.apiKey;
 
-            if (apikey == null || apikey.isEmpty()) {
-                apikey = askForApiKeyAndThrowIfNotGiven();
+            if (apiKey == null || apiKey.isEmpty()) {
+                apiKey = askForApiKeyAndThrowIfNotGiven();
             }
         }
-        return apikey;
+        return apiKey;
     }
 
     private String askForApiKeyAndThrowIfNotGiven() {

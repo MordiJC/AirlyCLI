@@ -2,7 +2,7 @@ package io.github.mordijc.tasks;
 
 import io.github.mordijc.Application;
 
-public class InfoPrinter implements Application.ApplicationExecutionBlock {
+public class InfoPrinterTask implements Application.ApplicationExecutionBlock {
     @Override
     public void run(Application app) {
         System.out.println(

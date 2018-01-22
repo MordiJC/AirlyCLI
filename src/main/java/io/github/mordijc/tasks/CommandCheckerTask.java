@@ -4,7 +4,7 @@ import io.github.mordijc.Application;
 import io.github.mordijc.command.Command;
 import picocli.CommandLine;
 
-public class CommandChecker implements Application.ApplicationExecutionBlock {
+public class CommandCheckerTask implements Application.ApplicationExecutionBlock {
 
     @Override
     public void run(Application app) throws Application.ApplicationExecutionBlockException {

@@ -1,7 +1,7 @@
 package io.github.mordijc.format;
 
-import io.github.mordijc.rest.containers.SensorMeasurements;
 import io.github.mordijc.rest.containers.SensorInfo;
+import io.github.mordijc.rest.containers.SensorMeasurements;
 import io.github.mordijc.rest.containers.common.Measurement;
 
 import java.util.Collections;
@@ -13,103 +13,93 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.max;
 
+/**
+ * Sensor data formatting class.
+ */
 public class SensorFormatter {
+    /**
+     * @param sensorInfo         basic sensor data.
+     * @param sensorMeasurements sensor measurements (only current measurements will used)
+     * @return curses-like box with information about sensor.
+     */
     public String format(SensorInfo sensorInfo, SensorMeasurements sensorMeasurements) {
         return format(sensorInfo, sensorMeasurements.currentMeasurements);
     }
 
+    /**
+     * @param sensorInfo  basic sensor data.
+     * @param measurement sensor measurement.
+     * @return curses-like box with information about sensor.
+     */
     public String format(SensorInfo sensorInfo, Measurement measurement) {
-        // Data
         String airQualityIndex = Integer.toString((int) Math.round(measurement.airQualityIndex));
         String pm25 = Integer.toString((int) Math.round(measurement.pm25));
         String pm10 = Integer.toString((int) Math.round(measurement.pm10));
-        String pressure = Integer.toString((int) Math.round(measurement.pressure/100));
+        String pressure = Integer.toString((int) Math.round(measurement.pressure / 100));
         String temperature = Integer.toString((int) Math.round(measurement.temperature));
         String humidity = Integer.toString((int) Math.round(measurement.humidity));
-        String address = sensorInfo.address.route + " " +
-                sensorInfo.address.streetNumber;
+        String address = sensorInfo.address.route + " " + sensorInfo.address.streetNumber;
         String city = sensorInfo.address.locality;
-
         int pm25_value = (int) Math.round(measurement.pm25);
         int pm10_value = (int) Math.round(measurement.pm10);
 
-        Supplier<Stream<String>> measurement_values_supplier = () -> Stream.of(
-                pm25, pm10, pressure, temperature, humidity
-        );
-
-        Supplier<Stream<String>> measurement_names_supplier = () -> Stream.of(
-                "PM 2.5", "PM 10", "Pressure", "Temp.", "Humidity"
-        );
-
-        Supplier<Stream<String>> measurement_units_supplier = () -> Stream.of(
-                "\u03BCg/m\u00B3", "\u03BCg/m\u00B3", "hPa", "\u00B0C", "%"
-        );
+        Supplier<Stream<String>> measurement_values_supplier =
+                () -> Stream.of(pm25, pm10, pressure, temperature, humidity);
+        Supplier<Stream<String>> measurement_names_supplier =
+                () -> Stream.of("PM 2.5", "PM 10", "Pressure", "Temp.", "Humidity");
+        Supplier<Stream<String>> measurement_units_supplier =
+                () -> Stream.of("\u03BCg/m\u00B3", "\u03BCg/m\u00B3", "hPa", "\u00B0C", "%");
 
         // Top row
         int airQualityCellContentWidth = airQualityIndex.length();
         int airQualityCellWidth = airQualityCellContentWidth + 2;
-
         int addressCellContentWidth = max(max(address.length(), city.length()), 10);
         int addressCellWidth = addressCellContentWidth + 2;
 
         // Measurements
-        int longestMeasurementNameWidth = measurement_names_supplier.get()
-                .map(String::length).max(Integer::compareTo).orElse(5);
-
-        int longestMeasurementValueWidth = Stream.of(pm25, pm10, pressure, temperature)
-                .map(String::length).max(Integer::compareTo).orElse(3);
-
-        int longestMeasurementUnitWidth = measurement_units_supplier.get()
-                .map(String::length).max(Integer::compareTo).orElse(0);
-
-        int longestMeasurementPercentageValue =
+        int longestMeasurementNameWidth = getLargestOr(measurement_names_supplier, 5);
+        int longestMeasurementValueWidth = getLargestOr(() -> Stream.of(pm25, pm10, pressure, temperature), 3);
+        int longestMeasurementUnitWidth = getLargestOr(measurement_units_supplier, 0);
+        int longestMeasurementPercentageWidth =
                 Stream.of(Integer.toString(pm25_value * 4), Integer.toString(pm10_value * 2))
                         .map(s -> s.length() + 1).max(Integer::compareTo).orElse(0);
 
         int measurementsRowMinimumContentWidth = longestMeasurementNameWidth + 1
                 + longestMeasurementValueWidth + 1
                 + longestMeasurementUnitWidth + (longestMeasurementUnitWidth > 0 ? 1 : 0)
-                + longestMeasurementPercentageValue;
+                + longestMeasurementPercentageWidth;
         int measurementsRowMinimumWidth = measurementsRowMinimumContentWidth + 2;
 
-        if (measurementsRowMinimumWidth - airQualityCellWidth - 1
-                > addressCellWidth) {
-
+        if (measurementsRowMinimumWidth - airQualityCellWidth - 1 > addressCellWidth) {
             addressCellWidth = measurementsRowMinimumWidth - airQualityCellWidth - 1;
             addressCellContentWidth = addressCellWidth - 2;
-
-        } else if (measurementsRowMinimumWidth - airQualityCellWidth - 1
-                < addressCellWidth) {
-            measurementsRowMinimumContentWidth = addressCellWidth + airQualityCellWidth + 1;
-            measurementsRowMinimumWidth = measurementsRowMinimumContentWidth;
+        } else if (measurementsRowMinimumWidth - airQualityCellWidth - 1 < addressCellWidth) {
+            measurementsRowMinimumWidth = addressCellWidth + airQualityCellWidth + 1;
+            measurementsRowMinimumContentWidth = measurementsRowMinimumWidth - 2;
         }
 
-
         int measurementsLineSpacesNumber = measurementsRowMinimumContentWidth - longestMeasurementNameWidth
-                - longestMeasurementValueWidth - longestMeasurementUnitWidth - longestMeasurementPercentageValue - 1 - 2;
+                - longestMeasurementValueWidth - longestMeasurementUnitWidth - longestMeasurementPercentageWidth - 1;
 
-        String measurementsLineBasicFormat = getMeasurementsLineFormat(longestMeasurementNameWidth, longestMeasurementValueWidth, longestMeasurementUnitWidth, longestMeasurementPercentageValue, measurementsLineSpacesNumber);
+        String measurementsLineBasicFormat = getMeasurementsLineFormat(longestMeasurementNameWidth,
+                longestMeasurementValueWidth, longestMeasurementUnitWidth,
+                longestMeasurementPercentageWidth, measurementsLineSpacesNumber);
 
-        List<String> measurementLines = prepare(measurementsLineBasicFormat,
-                measurement_names_supplier.get(),
-                measurement_values_supplier.get(),
-                measurement_units_supplier.get(),
-                Stream.of(Integer.toString(pm25_value * 4) + "%", Integer.toString(pm10_value * 2) + "%")
-        );
+        List<String> measurementLines = prepare(measurementsLineBasicFormat, measurement_names_supplier.get(),
+                measurement_values_supplier.get(), measurement_units_supplier.get(),
+                Stream.of(Integer.toString(pm25_value * 4) + "%", Integer.toString(pm10_value * 2) + "%"));
 
         return getTopTableLine(airQualityCellWidth, addressCellWidth) +
-                "\u2551 " +
-                airQualityIndex +
-                " \u2551 " +
-                createAddressCellContent(address, addressCellContentWidth) +
-                " \u2551\n" +
-                '\u2560' +
-                String.join("", Collections.nCopies(airQualityCellWidth, "\u2550")) +
-                "\u255D " +
-                createAddressCellContent(city, addressCellContentWidth) +
-                " \u2551\n\u2551 " +
-                createMeasurementLines(measurementLines) +
+                "\u2551 " + airQualityIndex +
+                " \u2551 " + createAddressCellContent(address, addressCellContentWidth) +
+                " \u2551\n\u2560" + String.join("", Collections.nCopies(airQualityCellWidth, "\u2550")) +
+                "\u255D " + createAddressCellContent(city, addressCellContentWidth) +
+                " \u2551\n\u2551 " + createMeasurementLines(measurementLines) +
                 getBottomTableLine(airQualityCellWidth, addressCellWidth);
+    }
+
+    private int getLargestOr(Supplier<Stream<String>> supplier, int i) {
+        return supplier.get().map(String::length).max(Integer::compareTo).orElse(i);
     }
 
     private String getMeasurementsLineFormat(int longestMeasurementNameWidth, int longestMeasurementValueWidth, int longestMeasurementUnitWidth, int longestMeasurementPercentageValue, int measurementsLineSpacesNumber) {
