@@ -130,9 +130,7 @@ public class AirlySensorInfoTask implements Application.ApplicationExecutionBloc
     private Retrofit getRetrofit(String apikey) {
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder().addInterceptor(
                 chain -> {
-                    Request originalRequest = chain.request();
-
-                    Request.Builder builder = originalRequest
+                    Request.Builder builder = chain.request()
                             .newBuilder()
                             .addHeader("apiKey", apikey);
 
@@ -149,7 +147,6 @@ public class AirlySensorInfoTask implements Application.ApplicationExecutionBloc
                         );
                     }
                 }
-
         ).build();
 
         return new Retrofit.Builder()
