@@ -68,7 +68,7 @@ public final class Application {
                 }
             }
         } catch (ApplicationExecutionBlockException e) {
-            System.err.println("Application tasks exception: " + e.getMessage());
+            System.err.println("Application error: " + e.getMessage());
         }
     }
 

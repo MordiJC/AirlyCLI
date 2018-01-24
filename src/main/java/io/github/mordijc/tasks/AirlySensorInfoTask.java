@@ -54,13 +54,23 @@ public class AirlySensorInfoTask implements Application.ApplicationExecutionBloc
                 return;
             }
 
-            SensorInfo sensorInfo = service.getSensorInfo(command.sensorId)
-                    .execute().body();
+            Response<SensorInfo> sensorInfoResponse = service.getSensorInfo(command.sensorId)
+                    .execute();
 
-            System.out.println(
-                    new SensorFormatter()
-                    .format(sensorInfo, sensorMeasurementsResponse.body())
-            );
+            if (handleConnectionErrorsAndTellIfOccured(app, sensorInfoResponse)) {
+                return;
+            }
+
+            SensorInfo sensorInfo = sensorInfoResponse.body();
+
+            try {
+                System.out.println(
+                        new SensorFormatter()
+                                .format(sensorInfo, sensorMeasurementsResponse.body())
+                );
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error while formatting data. Probably insufficient data. Current measurements may be unavailable.");
+            }
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -109,16 +119,16 @@ public class AirlySensorInfoTask implements Application.ApplicationExecutionBloc
         }
     }
 
-    private <T> boolean handleConnectionErrorsAndTellIfOccured(Application app, Response<T> nearestSensorResponse) throws IOException {
-        if (nearestSensorResponse.code() >= 400) {
-                if (nearestSensorResponse.errorBody() != null) {
-                    ApiError apiError = new ApiError(nearestSensorResponse.errorBody().string());
+    private <T> boolean handleConnectionErrorsAndTellIfOccured(Application app, Response<T> response) throws IOException {
+        if (response.code() >= 400) {
+                if (response.errorBody() != null) {
+                    ApiError apiError = new ApiError(response.errorBody().string());
 
                     System.err.println(
                             "API error: " + apiError.message
                     );
                 } else {
-                    System.err.println("Unknown API error. Code: " + nearestSensorResponse.code());
+                    System.err.println("Unknown API error. Code: " + response.code());
                 }
 
                 app.exit();
@@ -130,9 +140,11 @@ public class AirlySensorInfoTask implements Application.ApplicationExecutionBloc
     private Retrofit getRetrofit(String apikey) {
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder().addInterceptor(
                 chain -> {
-                    Request.Builder builder = chain.request()
+                    Request original = chain.request();
+                    Request.Builder builder = original
                             .newBuilder()
-                            .addHeader("apiKey", apikey);
+                            .addHeader("apikey", apikey)
+                            .addHeader("Accept", "application/json");
 
                     Request newRequest = builder.build();
 

@@ -23,6 +23,9 @@ public class SensorFormatter {
      * @return curses-like box with information about sensor.
      */
     public String format(SensorInfo sensorInfo, SensorMeasurements sensorMeasurements) {
+        if(sensorInfo == null || sensorMeasurements == null) {
+            throw new IllegalArgumentException("Arguments must not be null");
+        }
         return format(sensorInfo, sensorMeasurements.currentMeasurements);
     }
 
@@ -32,6 +35,10 @@ public class SensorFormatter {
      * @return curses-like box with information about sensor.
      */
     public String format(SensorInfo sensorInfo, Measurement measurement) {
+        if(sensorInfo == null || measurement == null || measurement.isNull()) {
+            throw new IllegalArgumentException("Arguments must not be null.");
+        }
+
         String airQualityIndex = Integer.toString((int) Math.round(measurement.airQualityIndex));
         String pm25 = Integer.toString((int) Math.round(measurement.pm25));
         String pm10 = Integer.toString((int) Math.round(measurement.pm10));

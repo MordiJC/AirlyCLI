@@ -20,7 +20,7 @@ public interface AirlyService {
      * @param longitude longitude of searching area point.
      * @return {@code NearestSensor} instance.
      */
-    @GET("v1/nearestSensor/measurement")
+    @GET("v1/nearestSensor/measurements")
     Call<NearestSensor> getNearestSensorData(@Query("latitude") double latitude, @Query("longitude") double longitude);
 
     /**
@@ -29,7 +29,7 @@ public interface AirlyService {
      * @param sensorId id of sensor.
      * @return measurement.
      */
-    @GET("v1/sensor/measurement")
+    @GET("v1/sensor/measurements")
     Call<SensorMeasurements> getSensorMeasurements(@Query("sensorId") int sensorId);
 
     /**

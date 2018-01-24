@@ -25,7 +25,7 @@ public class Command {
 
     @CommandLine.Option(
             names = {"--longitude"},
-            description = "Nearest sensor searcing longitude. (Latitude must be provided as well)")
+            description = "Nearest sensor searching longitude. (Latitude must be provided as well)")
     public Double longitude = null;
 
     @CommandLine.Option(

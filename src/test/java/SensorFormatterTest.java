@@ -22,7 +22,7 @@ public class SensorFormatterTest {
         );
 
         Measurement measurement = new Measurement(
-                153,
+                153.0,
                 0.0,
                 new Date(),
                 33.2,
